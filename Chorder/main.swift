@@ -149,6 +149,7 @@ private func main(configuration: Configuration) {
         return MeasureRhythm(beatsWithChords: beatsWithChords)
     }
 
+    // TODO: Start here next time. Organize this stuff. Should only need to make cp-less /trends/nodes request once, and then can append the query parameter `cp`, like `?cp=4,1` or w/e. See https://www.hooktheory.com/api/trends/docs and http://forum.hooktheory.com/t/trends-api-chord-input/272 
     let group = DispatchGroup()
     let queue = DispatchQueue(label: "Chorder.networkRequestQueue", qos: .default, attributes: .concurrent)
 
