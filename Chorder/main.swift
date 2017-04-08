@@ -154,26 +154,44 @@ private func main(configuration: Configuration) {
     let queue = DispatchQueue(label: "Chorder.networkRequestQueue", qos: .default, attributes: .concurrent)
 
     let session = urlSession(with: configuration.activkey)
-    guard let url = URL(string: "https://api.hooktheory.com/v1/trends/nodes") else { fatalError("Invalid URL!") }
-    measureRhythms.forEach { measureRhythm in
+
+    var chords = ""
+
+    func request(with measureRhythms: [MeasureRhythm]) {
+        guard let measureRhythm = measureRhythms.first else { return }
+
         group.enter()
         queue.async(group: group) {
+            var urlComponents = URLComponents(string: "https://api.hooktheory.com/v1/trends/nodes")
+            if !chords.isEmpty {
+                urlComponents?.queryItems = [URLQueryItem(name: "cp", value: chords)]
+            }
+            guard let url = urlComponents?.url else { return assertionFailure("Invalid URL") }
+
+            print(url)
             let task = session.dataTask(with: url) { (data, response, error) in
                 defer { group.leave() }
 
                 guard let data = data else { return }
 
                 do {
-                    let parsedData = try JSONSerialization.jsonObject(with: data, options: []) as! [[String: Any]]
-                    print(parsedData)
+                    let commonChords = try JSONSerialization.jsonObject(with: data, options: []) as! [[String: Any]]
+                    guard let chord = commonChords.randomElement?["chord_HTML"] else { return }
+                    chords.append("\(chords.isEmpty ? "" : ",")\(chord)")
+                    print(chords)
+
+                    let remainingMeasureRhythms = Array(measureRhythms.suffix(from: 1))
+                    request(with: remainingMeasureRhythms)
                 } catch let error {
                     print(error)
                 }
             }
-
+            
             task.resume()
         }
     }
+
+    request(with: measureRhythms)
 
     group.wait()
 }
