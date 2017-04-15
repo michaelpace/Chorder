@@ -109,6 +109,38 @@ protocol Process {
     func start()
 }
 
+/// Represents a Hooktheory chord, as returned from the trends/nodes endpoint.
+struct Chord {
+
+    /// The chord's Hooktheory ID.
+    let id: String
+
+    /// The chord's HTML representation.
+    let html: String
+
+    /// The chord's probability of occurring within given the sequence of chords leading to this chord.
+    let probability: Double
+
+    /// The chord's child path describing the sequence of chords culminating with this chord. Used to ask Hooktheory about chords following this chord.
+    let childPath: String
+
+    init?(json: [String: Any]?) {
+        guard let json = json else { return nil }
+
+        guard
+            let id = json["chord_ID"] as? String,
+            let html = json["chord_HTML"] as? String,
+            let probability = json["probability"] as? Double,
+            let childPath = json["child_path"] as? String else { return nil }
+
+        self.id = id
+        self.html = html
+        self.probability = probability
+        self.childPath = childPath
+
+    }
+}
+
 final class Chorder: Process {
 
     // MARK: - Process
@@ -177,24 +209,21 @@ final class Chorder: Process {
                     let commonChords = try JSONSerialization.jsonObject(with: data, options: []) as! [[String: Any]]
 
                     guard
-                        let chord = Array(commonChords.prefix(3)).randomElement else
+                        let chordJSON = Array(commonChords.prefix(8)).randomElement else
                     {
                         print("no chords returned from hooktheory")
                         self.isFinished = true
                         return
                     }
 
-                    guard
-                        let childPath = chord["child_path"] as? String,
-                        let chordHTML = chord["chord_HTML"] as? String else
-                    {
+                    guard let chord = Chord(json: chordJSON) else {
                         print("invalid chord")
                         self.isFinished = true
                         return
                     }
 
-                    chords = childPath
-                    print(chordHTML)
+                    chords = chord.childPath
+                    print(chord)
 
                     let remainingMeasureRhythms = Array(measureRhythms.suffix(from: 1))
                     request(with: remainingMeasureRhythms)
