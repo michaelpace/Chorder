@@ -109,7 +109,7 @@ protocol Process {
     func start()
 }
 
-/// Represents a Hooktheory chord, as returned from the trends/nodes endpoint.
+/// Represents a Hooktheory chord, as returned from the `trends/nodes` endpoint.
 struct Chord {
 
     /// The chord's Hooktheory ID.
@@ -124,6 +124,9 @@ struct Chord {
     /// The chord's child path describing the sequence of chords culminating with this chord. Used to ask Hooktheory about chords following this chord.
     let childPath: String
 
+    /// Initializes a new `Chord` given a JSON object retrieved from Hooktheory's API. May return `nil` if invalid JSON is provided.
+    ///
+    /// - parameter json: The JSON retrieved from Hooktheory's API. Expected to contain "chord_ID", "chord_HTML", "probability", and "child_path" key-value pairs.
     init?(json: [String: Any]?) {
         guard let json = json else { return nil }
 
