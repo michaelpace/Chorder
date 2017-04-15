@@ -118,7 +118,7 @@ struct Chord {
     /// The chord's HTML representation.
     let html: String
 
-    /// The chord's probability of occurring within given the sequence of chords leading to this chord.
+    /// The chord's probability of occurring relative to all chords within Hooktheory's database. This probability is independent of the chord progression containing this chord.
     let probability: Double
 
     /// The chord's child path describing the sequence of chords culminating with this chord. Used to ask Hooktheory about chords following this chord.
@@ -244,5 +244,5 @@ autoreleasepool {
     let chorder = Chorder()
     chorder.start()
 
-    while !chorder.isFinished && RunLoop.current.run(mode: .defaultRunLoopMode, before: Date(timeIntervalSinceNow: 1)) {}
+    while !chorder.isFinished {}
 }
