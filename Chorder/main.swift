@@ -138,47 +138,80 @@ func urlSession(with activkey: String) -> URLSession {
     return URLSession(configuration: sessionConfiguration)
 }
 
-// MARK: - Chorder
+/// A protocol describing a type which is a process which can be finished.
+protocol Process {
 
-private func main(configuration: Configuration) {
+    /// Whether this process is finished. Set to `true` to finish the process.
+    var isFinished: Bool { get set }
 
-    // TODO: Constant-ize or configure-ize [2, 4, 8]?
-    guard let numberOfMeasures = [2, 4, 8].randomElement else { return assertionFailure("Failure retrieving a random element.") }
-    let measureRhythms: [MeasureRhythm] = (0..<numberOfMeasures).flatMap { _ in
-        guard let beatsWithChords = configuration.timeSignature.validChordBeats.randomElement else { assertionFailure("Failure retrieving a random element."); return nil }
-        return MeasureRhythm(beatsWithChords: beatsWithChords)
+    /// Starts the process.
+    func start()
+}
+
+final class Chorder: Process {
+
+    // MARK: - Process
+
+    var isFinished = false
+
+    func start() {
+        let enumeratedArguments = CommandLine.arguments.suffix(from: 1).enumerated()
+        let keys = enumeratedArguments.flatMap { (index, argument) in return index.isEven ? argument : nil }
+        let values = enumeratedArguments.flatMap { (index, argument) in return index.isOdd ? argument : nil }
+        let parsedArguments = zip(keys, values).flatMap { (key, value) in return Argument(key: key, value: value) }
+        guard let configuration = Configuration(arguments: parsedArguments) else { fatalError("Invalid arguments.") }
+
+        main(configuration: configuration)
     }
 
-    // TODO: Start here next time. Organize this stuff. Should only need to make cp-less /trends/nodes request once, and then can append the query parameter `cp`, like `?cp=4,1` or w/e. See https://www.hooktheory.com/api/trends/docs and http://forum.hooktheory.com/t/trends-api-chord-input/272 
-    let group = DispatchGroup()
-    let queue = DispatchQueue(label: "Chorder.networkRequestQueue", qos: .default, attributes: .concurrent)
+    private func main(configuration: Configuration) {
 
-    let session = urlSession(with: configuration.activkey)
+        // TODO: Constant-ize or configure-ize [2, 4, 8]?
+        guard let numberOfMeasures = [2, 4, 8].randomElement else { return assertionFailure("Failure retrieving a random element.") }
+        let measureRhythms: [MeasureRhythm] = (0..<numberOfMeasures).flatMap { _ in
+            guard let beatsWithChords = configuration.timeSignature.validChordBeats.randomElement else { assertionFailure("Failure retrieving a random element."); return nil }
+            return MeasureRhythm(beatsWithChords: beatsWithChords)
+        }
 
-    var chords = ""
+        // TODO: Start here next time. Organize this stuff. Should only need to make cp-less /trends/nodes request once, and then can append the query parameter `cp`, like `?cp=4,1` or w/e. See https://www.hooktheory.com/api/trends/docs and http://forum.hooktheory.com/t/trends-api-chord-input/272
 
-    func request(with measureRhythms: [MeasureRhythm]) {
-        guard let measureRhythm = measureRhythms.first else { return }
+        let session = urlSession(with: configuration.activkey)
 
-        group.enter()
-        queue.async(group: group) {
+        var chords = ""
+        print("going to request \(measureRhythms.count) chords")
+
+        func request(with measureRhythms: [MeasureRhythm]) {
+            guard let _ = measureRhythms.first else {
+                print("requested all the chords")
+                isFinished = true
+                return
+            }
+
             var urlComponents = URLComponents(string: "https://api.hooktheory.com/v1/trends/nodes")
             if !chords.isEmpty {
                 urlComponents?.queryItems = [URLQueryItem(name: "cp", value: chords)]
             }
             guard let url = urlComponents?.url else { return assertionFailure("Invalid URL") }
 
-            print(url)
             let task = session.dataTask(with: url) { (data, response, error) in
-                defer { group.leave() }
+                if let error = error {
+                    print("error: \(error)")
+                    return
+                }
 
-                guard let data = data else { return }
+                guard let data = data else {
+                    print("no data")
+                    return
+                }
 
                 do {
                     let commonChords = try JSONSerialization.jsonObject(with: data, options: []) as! [[String: Any]]
-                    guard let chord = commonChords.randomElement?["chord_HTML"] else { return }
-                    chords.append("\(chords.isEmpty ? "" : ",")\(chord)")
-                    print(chords)
+                    guard let chord = commonChords.randomElement else { print("no chords returned from hooktheory"); self.isFinished = true; return }
+                    guard let childPath = chord["child_path"] as? String else { print("no childPath"); self.isFinished = true; return }
+                    guard let chordHTML = chord["chord_HTML"] as? String else { print("no childPath"); self.isFinished = true; return }
+
+                    chords = childPath
+                    print(chordHTML)
 
                     let remainingMeasureRhythms = Array(measureRhythms.suffix(from: 1))
                     request(with: remainingMeasureRhythms)
@@ -189,20 +222,14 @@ private func main(configuration: Configuration) {
             
             task.resume()
         }
+        
+        request(with: measureRhythms)
     }
-
-    request(with: measureRhythms)
-
-    group.wait()
 }
 
-// MARK: - Entry point
+autoreleasepool {
+    let chorder = Chorder()
+    chorder.start()
 
-// TODO: Organize.
-let enumeratedArguments = CommandLine.arguments.suffix(from: 1).enumerated()
-let keys = enumeratedArguments.flatMap { (index, argument) in return index.isEven ? argument : nil }
-let values = enumeratedArguments.flatMap { (index, argument) in return index.isOdd ? argument : nil }
-let parsedArguments = zip(keys, values).flatMap { (key, value) in return Argument(key: key, value: value) }
-guard let configuration = Configuration(arguments: parsedArguments) else { fatalError("Invalid arguments.") }
-
-main(configuration: configuration)
+    while !chorder.isFinished && RunLoop.current.run(mode: .defaultRunLoopMode, before: Date(timeIntervalSinceNow: 1)) {}
+}
