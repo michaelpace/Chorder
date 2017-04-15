@@ -187,6 +187,8 @@ final class Chorder: Process {
                 return
             }
 
+            sleep(1)
+
             var urlComponents = URLComponents(string: "https://api.hooktheory.com/v1/trends/nodes")
             if !chords.isEmpty {
                 urlComponents?.queryItems = [URLQueryItem(name: "cp", value: chords)]
@@ -194,6 +196,12 @@ final class Chorder: Process {
             guard let url = urlComponents?.url else { return assertionFailure("Invalid URL") }
 
             let task = session.dataTask(with: url) { (data, response, error) in
+                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                    print("non-200")
+                    self.isFinished = true
+                    return
+                }
+
                 if let error = error {
                     print("error: \(error)")
                     return
@@ -206,15 +214,30 @@ final class Chorder: Process {
 
                 do {
                     let commonChords = try JSONSerialization.jsonObject(with: data, options: []) as! [[String: Any]]
-                    guard let chord = commonChords.randomElement else { print("no chords returned from hooktheory"); self.isFinished = true; return }
-                    guard let childPath = chord["child_path"] as? String else { print("no childPath"); self.isFinished = true; return }
-                    guard let chordHTML = chord["chord_HTML"] as? String else { print("no childPath"); self.isFinished = true; return }
+
+                    guard
+                        let chord = Array(commonChords.prefix(3)).randomElement else
+                    {
+                        print("no chords returned from hooktheory")
+                        self.isFinished = true
+                        return
+                    }
+
+                    guard
+                        let childPath = chord["child_path"] as? String,
+                        let chordHTML = chord["chord_HTML"] as? String else
+                    {
+                        print("invalid chord")
+                        self.isFinished = true
+                        return
+                    }
 
                     chords = childPath
                     print(chordHTML)
 
                     let remainingMeasureRhythms = Array(measureRhythms.suffix(from: 1))
                     request(with: remainingMeasureRhythms)
+
                 } catch let error {
                     print(error)
                 }
