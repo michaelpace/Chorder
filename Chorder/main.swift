@@ -144,6 +144,35 @@ struct Chord {
     }
 }
 
+/*
+ 
+ chord metasyntax from http://forum.hooktheory.com/t/vizualitation-of-all-chord-progressions-kinda/164/4
+ -------------------------------------------------------------------------------------------------------
+
+ (* Roman numerals *)
+ numeral = "1" | "2" | "3" | "4" | "5" | "6" | "7";
+
+ (* Borrowed modes, from Dorian to Locrian *)
+ mode = "D" | "Y" | "L" | "M" | "b" | "C";
+
+ (* Figured bass for triadic and seventh chords *)
+ inversion = "6" | "64" | "7" | "65" | "43" | "42";
+
+ (* Functions available for applied chords *)
+ function = "4" | "5" | "7";
+
+ (* Basic chords or borrowed chords in the relative Major key *)
+ simple-chord = [mode], numeral, [inversion];
+
+ (* Applied chords *)
+ applied-chord = function, [inversion], "/", numeral;
+
+ (* Chord progressions for both the Trends page and the API *)
+ chord = simple-chord | applied-chord;
+ trends-progression = chord, {".", chord};
+ api-progression = chord, {",", chord};
+ */
+
 final class Chorder: Process {
 
     // MARK: - Process
