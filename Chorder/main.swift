@@ -8,45 +8,6 @@
 
 import Foundation
 
-/*
- future TODO:
- - access control
- - test extensions
- */
-
-// MARK: - Extensions
-
-extension Array {
-
-    /// A random element in this array if it isn't empty, or nil otherwise.
-    var randomElement: Element? {
-        guard isNotEmpty else { return nil }
-
-        let index = Int(arc4random_uniform(UInt32(count)))
-        return self[index]
-    }
-
-    /// Whether this array is empty.
-    var isNotEmpty: Bool {
-        return !isEmpty
-    }
-    
-}
-
-extension Int {
-
-    /// Whether this `Int` is an even value.
-    var isEven: Bool {
-        return self % 2 == 0
-    }
-
-    /// Whether this `Int` is an odd value.
-    var isOdd: Bool {
-        return !isEven
-    }
-
-}
-
 // MARK: - Types
 
 /// Represents a parsed command line argument.

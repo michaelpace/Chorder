@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		640D06E31EA2BCEC00AEF48E /* Array+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06E21EA2BCEC00AEF48E /* Array+Random.swift */; };
+		640D06E51EA2BD0C00AEF48E /* Array+Empty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06E41EA2BD0C00AEF48E /* Array+Empty.swift */; };
+		640D06E81EA2BD4E00AEF48E /* Int+Parity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06E71EA2BD4E00AEF48E /* Int+Parity.swift */; };
 		64BFBFEA1E98902F005DBCF5 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BFBFE91E98902F005DBCF5 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +26,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		640D06E21EA2BCEC00AEF48E /* Array+Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Random.swift"; sourceTree = "<group>"; };
+		640D06E41EA2BD0C00AEF48E /* Array+Empty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Empty.swift"; sourceTree = "<group>"; };
+		640D06E71EA2BD4E00AEF48E /* Int+Parity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Int+Parity.swift"; sourceTree = "<group>"; };
 		64BFBFE61E98902F005DBCF5 /* Chorder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Chorder; sourceTree = BUILT_PRODUCTS_DIR; };
 		64BFBFE91E98902F005DBCF5 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -38,6 +44,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		640D06E61EA2BD3E00AEF48E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				640D06E21EA2BCEC00AEF48E /* Array+Random.swift */,
+				640D06E41EA2BD0C00AEF48E /* Array+Empty.swift */,
+				640D06E71EA2BD4E00AEF48E /* Int+Parity.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
 		64BFBFDD1E98902F005DBCF5 = {
 			isa = PBXGroup;
 			children = (
@@ -58,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				64BFBFE91E98902F005DBCF5 /* main.swift */,
+				640D06E61EA2BD3E00AEF48E /* Extensions */,
 			);
 			path = Chorder;
 			sourceTree = "<group>";
@@ -121,7 +138,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				640D06E31EA2BCEC00AEF48E /* Array+Random.swift in Sources */,
 				64BFBFEA1E98902F005DBCF5 /* main.swift in Sources */,
+				640D06E81EA2BD4E00AEF48E /* Int+Parity.swift in Sources */,
+				640D06E51EA2BD0C00AEF48E /* Array+Empty.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +273,7 @@
 				64BFBFEF1E98902F005DBCF5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
