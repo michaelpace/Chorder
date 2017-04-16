@@ -167,36 +167,6 @@ extension Character {
 
 }
 
-/*
- 
- chord metasyntax from http://forum.hooktheory.com/t/vizualitation-of-all-chord-progressions-kinda/164/4
- -------------------------------------------------------------------------------------------------------
-
- (* Roman numerals *)
- numeral = "1" | "2" | "3" | "4" | "5" | "6" | "7";
-
- (* Borrowed modes, from Dorian to Locrian *)
- mode = "D" | "Y" | "L" | "M" | "b" | "C";
-
- (* Figured bass for triadic and seventh chords *)
- inversion = "6" | "64" | "7" | "65" | "43" | "42";
-
- (* Functions available for applied chords *)
- function = "4" | "5" | "7";
-
- (* Basic chords or borrowed chords in the relative Major key *)
- simple-chord = [mode], numeral, [inversion];
-
- (* Applied chords *)
- applied-chord = function, [inversion], "/", numeral;
-
- (* Chord progressions for both the Trends page and the API *)
- chord = simple-chord | applied-chord;
- trends-progression = chord, {".", chord};
- api-progression = chord, {",", chord};
-
- */
-
 enum Token: Equatable {
     case letter(value: String)
     case number(value: String)
@@ -236,6 +206,25 @@ enum Numeral {
     case five
     case six
     case seven
+
+    var defaultMode: Mode {
+        switch self {
+        case .one:
+            return .ionian
+        case .two:
+            return .dorian
+        case .three:
+            return .phrygian
+        case .four:
+            return .lydian
+        case .five:
+            return .mixolydian
+        case .six:
+            return .aeolian
+        case .seven:
+            return .locrian
+        }
+    }
 }
 
 extension Numeral {
@@ -267,7 +256,7 @@ enum Mode {
     case phrygian
     case lydian
     case mixolydian
-    case aoelian
+    case aeolian
     case locrian
 }
 
@@ -283,7 +272,7 @@ extension Mode {
         case "m":
             self = .mixolydian
         case "b":
-            self = .aoelian
+            self = .aeolian
         case "c":
             self = .locrian
         default:
@@ -476,7 +465,7 @@ struct Parser {
                     return nil
                 }
 
-                return SimpleChord(mode: .ionian, inversion: inversion, numeral: numeral)
+                return SimpleChord(mode: numeral.defaultMode, inversion: inversion, numeral: numeral)
 
             } else if case (let .number(functionString), let .number(numeralString)) = twoTokens {
 
@@ -494,7 +483,7 @@ struct Parser {
 
         case 1:
             guard case let .number(numeralString) = tokens[0], let numeral = Numeral(hooktheoryString: numeralString) else { assertionFailure("Invalid tokens: \(tokens)"); return nil }
-            return SimpleChord(mode: .ionian, inversion: nil, numeral: numeral)
+            return SimpleChord(mode: numeral.defaultMode, inversion: nil, numeral: numeral)
 
         default:
             assertionFailure("Invalid tokens: \(tokens)")
@@ -502,17 +491,9 @@ struct Parser {
 
         }
 
-        return SimpleChord(mode: .ionian, inversion: nil, numeral: .one)
+        return nil
     }
 
-}
-
-// Test code. TODO: Remove.
-let strings = ["1", "m164", "b1", "b76", "7/5", "443/7"]
-strings.forEach { string in
-    guard let tokens = Tokenizer.tokenize(string: string) else { fatalError() }
-    let chord = Parser.parse(tokens: tokens)
-    print(chord)
 }
 
 final class Chorder: Process {
@@ -544,7 +525,7 @@ final class Chorder: Process {
 
         let session = urlSession(with: configuration.activkey)
 
-        var chords = ""
+        var childPath = ""
         print("going to request \(measureRhythms.count) chords")
 
         func request(with measureRhythms: [MeasureRhythm]) {
@@ -557,8 +538,8 @@ final class Chorder: Process {
             sleep(1)
 
             var urlComponents = URLComponents(string: "https://api.hooktheory.com/v1/trends/nodes")
-            if !chords.isEmpty {
-                urlComponents?.queryItems = [URLQueryItem(name: "cp", value: chords)]
+            if !childPath.isEmpty {
+                urlComponents?.queryItems = [URLQueryItem(name: "cp", value: childPath)]
             }
             guard let url = urlComponents?.url else { return assertionFailure("Invalid URL") }
 
@@ -590,14 +571,17 @@ final class Chorder: Process {
                         return
                     }
 
-                    guard let chord = HooktheoryChord(json: chordJSON) else {
+                    guard let hooktheoryChord = HooktheoryChord(json: chordJSON) else {
                         print("invalid chord")
                         self.isFinished = true
                         return
                     }
 
-                    chords = chord.childPath
-                    print(chord)
+                    childPath = hooktheoryChord.childPath
+
+                    guard let tokens = Tokenizer.tokenize(string: hooktheoryChord.id) else { assertionFailure("Unable to tokenize chord: \(hooktheoryChord.id)"); return }
+                    let chord = Parser.parse(tokens: tokens)
+                    print("Parsed version of \(hooktheoryChord.id): \(chord)")
 
                     let remainingMeasureRhythms = Array(measureRhythms.suffix(from: 1))
                     request(with: remainingMeasureRhythms)
