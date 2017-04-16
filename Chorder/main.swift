@@ -110,7 +110,7 @@ protocol Process {
 }
 
 /// Represents a Hooktheory chord, as returned from the `trends/nodes` endpoint.
-struct Chord {
+struct HooktheoryChord {
 
     /// The chord's Hooktheory ID.
     let id: String
@@ -144,6 +144,29 @@ struct Chord {
     }
 }
 
+extension Character {
+
+    var unicodeScalar: UnicodeScalar? {
+        return String(self).unicodeScalars.first
+    }
+
+    var isNumeric: Bool {
+        guard let unicodeScalar = unicodeScalar else { return false }
+        return CharacterSet.decimalDigits.contains(unicodeScalar)
+    }
+
+    var isLetter: Bool {
+        guard let unicodeScalar = unicodeScalar else { return false }
+        return CharacterSet.letters.contains(unicodeScalar)
+    }
+
+    var isSlash: Bool {
+        guard let unicodeScalar = unicodeScalar else { return false }
+        return CharacterSet(charactersIn: "/").contains(unicodeScalar)
+    }
+
+}
+
 /*
  
  chord metasyntax from http://forum.hooktheory.com/t/vizualitation-of-all-chord-progressions-kinda/164/4
@@ -171,7 +194,143 @@ struct Chord {
  chord = simple-chord | applied-chord;
  trends-progression = chord, {".", chord};
  api-progression = chord, {",", chord};
+ 
+ -------------------------------------------------------------------------------------------------------
+ 
+ simple chord:
+     letter? that's the mode
+     number. that's the numeral
+     number(s)? that's the inversion
+        letter? -> number -> numbers?
+ 
+ applied chord:
+     number. that's the function
+     number(s)? that's the inversion
+     /. that's the application sign.
+     number. that's the numeral.
+         number -> numbers? -> / -> number
+
  */
+
+enum Token {
+    case letter
+    case number
+    case slash
+
+    init?(character: Character) {
+        if character.isLetter {
+            self = .letter
+        } else if character.isNumeric {
+            self = .number
+        } else if character.isSlash {
+            self = .slash
+        } else {
+            return nil
+        }
+    }
+    
+}
+
+struct TokenSequence {
+    let tokens: [Token]
+
+    var hasSlash: Bool {
+        return tokens.contains(.slash)
+    }
+
+    init?(with tokens: [Token]) {
+        guard tokens.isNotEmpty else { return nil }
+
+        self.tokens = tokens
+    }
+}
+
+struct Tokenizer {
+
+    static func tokenize(string: String) -> TokenSequence? {
+        let tokens = string.characters.flatMap(Token.init)
+        return TokenSequence(with: tokens)
+    }
+
+}
+
+struct Parser {
+
+    func parse(tokens: TokenSequence) -> Chord {
+        if tokens.hasSlash {
+            // applied chord
+        } else {
+            // simple chord
+        }
+
+        return SimpleChord(mode: .ionian, inversion: nil, numeral: .one)
+    }
+
+}
+
+enum Numeral {
+    case one
+    case two
+    case three
+    case four
+    case five
+    case six
+    case seven
+}
+
+enum Mode {
+    case ionian
+    case dorian
+    case phrygian
+    case lydian
+    case mixolydian
+    case aoelian
+    case locrian
+}
+
+// TODO: Find actual names for these.
+enum Inversion {
+    case fourTwo
+    case fourThree
+    case six
+    case sixFour
+    case sixFive
+    case seven
+}
+
+enum Function {
+    case four
+    case five
+    case seven
+}
+
+protocol Chord {
+    var numeral: Numeral { get }
+    var notes: [Int] { get }
+}
+
+struct SimpleChord: Chord {
+    let mode: Mode
+    let inversion: Inversion?
+
+    // MARK: Chord
+    let numeral: Numeral
+    var notes: [Int] {
+        return [1, 4, 7]
+    }
+}
+
+struct AppliedChord: Chord {
+    let function: Function
+    let inversion: Inversion?
+
+    // MARK: Chord
+
+    let numeral: Numeral
+    var notes: [Int] {
+        return [1, 4, 7]
+    }
+}
 
 final class Chorder: Process {
 
@@ -248,7 +407,7 @@ final class Chorder: Process {
                         return
                     }
 
-                    guard let chord = Chord(json: chordJSON) else {
+                    guard let chord = HooktheoryChord(json: chordJSON) else {
                         print("invalid chord")
                         self.isFinished = true
                         return
