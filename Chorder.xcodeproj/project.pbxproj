@@ -10,6 +10,11 @@
 		640D06E31EA2BCEC00AEF48E /* Array+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06E21EA2BCEC00AEF48E /* Array+Random.swift */; };
 		640D06E51EA2BD0C00AEF48E /* Array+Empty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06E41EA2BD0C00AEF48E /* Array+Empty.swift */; };
 		640D06E81EA2BD4E00AEF48E /* Int+Parity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06E71EA2BD4E00AEF48E /* Int+Parity.swift */; };
+		640D06EA1EA32A4800AEF48E /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06E91EA32A4800AEF48E /* Tokenizer.swift */; };
+		640D06EC1EA32A5300AEF48E /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06EB1EA32A5300AEF48E /* Parser.swift */; };
+		640D06EE1EA32A9D00AEF48E /* Chord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06ED1EA32A9D00AEF48E /* Chord.swift */; };
+		640D06F01EA32ADA00AEF48E /* Hooktheory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06EF1EA32ADA00AEF48E /* Hooktheory.swift */; };
+		640D06F21EA32B4200AEF48E /* Character+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06F11EA32B4200AEF48E /* Character+Convenience.swift */; };
 		64BFBFEA1E98902F005DBCF5 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BFBFE91E98902F005DBCF5 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +34,11 @@
 		640D06E21EA2BCEC00AEF48E /* Array+Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Random.swift"; sourceTree = "<group>"; };
 		640D06E41EA2BD0C00AEF48E /* Array+Empty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Empty.swift"; sourceTree = "<group>"; };
 		640D06E71EA2BD4E00AEF48E /* Int+Parity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Int+Parity.swift"; sourceTree = "<group>"; };
+		640D06E91EA32A4800AEF48E /* Tokenizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tokenizer.swift; sourceTree = "<group>"; };
+		640D06EB1EA32A5300AEF48E /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
+		640D06ED1EA32A9D00AEF48E /* Chord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chord.swift; sourceTree = "<group>"; };
+		640D06EF1EA32ADA00AEF48E /* Hooktheory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hooktheory.swift; sourceTree = "<group>"; };
+		640D06F11EA32B4200AEF48E /* Character+Convenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Character+Convenience.swift"; sourceTree = "<group>"; };
 		64BFBFE61E98902F005DBCF5 /* Chorder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Chorder; sourceTree = BUILT_PRODUCTS_DIR; };
 		64BFBFE91E98902F005DBCF5 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -50,8 +60,27 @@
 				640D06E21EA2BCEC00AEF48E /* Array+Random.swift */,
 				640D06E41EA2BD0C00AEF48E /* Array+Empty.swift */,
 				640D06E71EA2BD4E00AEF48E /* Int+Parity.swift */,
+				640D06F11EA32B4200AEF48E /* Character+Convenience.swift */,
 			);
 			name = Extensions;
+			sourceTree = "<group>";
+		};
+		640D06F31EA32C5D00AEF48E /* Hooktheory */ = {
+			isa = PBXGroup;
+			children = (
+				640D06E91EA32A4800AEF48E /* Tokenizer.swift */,
+				640D06EB1EA32A5300AEF48E /* Parser.swift */,
+				640D06EF1EA32ADA00AEF48E /* Hooktheory.swift */,
+			);
+			name = Hooktheory;
+			sourceTree = "<group>";
+		};
+		640D06F41EA32C6600AEF48E /* Chord */ = {
+			isa = PBXGroup;
+			children = (
+				640D06ED1EA32A9D00AEF48E /* Chord.swift */,
+			);
+			name = Chord;
 			sourceTree = "<group>";
 		};
 		64BFBFDD1E98902F005DBCF5 = {
@@ -74,6 +103,8 @@
 			isa = PBXGroup;
 			children = (
 				64BFBFE91E98902F005DBCF5 /* main.swift */,
+				640D06F41EA32C6600AEF48E /* Chord */,
+				640D06F31EA32C5D00AEF48E /* Hooktheory */,
 				640D06E61EA2BD3E00AEF48E /* Extensions */,
 			);
 			path = Chorder;
@@ -139,9 +170,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				640D06E31EA2BCEC00AEF48E /* Array+Random.swift in Sources */,
+				640D06F21EA32B4200AEF48E /* Character+Convenience.swift in Sources */,
+				640D06EA1EA32A4800AEF48E /* Tokenizer.swift in Sources */,
+				640D06EC1EA32A5300AEF48E /* Parser.swift in Sources */,
 				64BFBFEA1E98902F005DBCF5 /* main.swift in Sources */,
 				640D06E81EA2BD4E00AEF48E /* Int+Parity.swift in Sources */,
 				640D06E51EA2BD0C00AEF48E /* Array+Empty.swift in Sources */,
+				640D06EE1EA32A9D00AEF48E /* Chord.swift in Sources */,
+				640D06F01EA32ADA00AEF48E /* Hooktheory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
