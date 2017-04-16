@@ -72,6 +72,8 @@ struct Chord {
     let inversion: Inversion?
     let function: Function?
     let numeral: Numeral
+
+    // TODO: Start here.
     var notes: [Int] {
         return [1, 4, 7]
     }

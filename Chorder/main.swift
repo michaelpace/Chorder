@@ -76,7 +76,7 @@ enum TimeSignature: String {
     var validChordBeats: [[Int]] {
         switch self {
         case .threeFour:
-            return [[1], [1, 2], [1, 3]]
+            return [[1], [1, 2], [1, 3], [2]]
         case .fourFour:
             return [[1], [1, 3], [1, 4], [2, 4], [3]]
         }
