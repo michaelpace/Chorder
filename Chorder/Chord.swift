@@ -67,32 +67,10 @@ enum Function {
 
 // MARK: - Chord
 
-protocol Chord {
-    var numeral: Numeral { get }
-    var notes: [Int] { get }
-}
-
-// MARK: - SimpleChord
-
-struct SimpleChord: Chord {
+struct Chord {
     let mode: Mode
     let inversion: Inversion?
-
-    // MARK: Chord
-    let numeral: Numeral
-    var notes: [Int] {
-        return [1, 4, 7]
-    }
-}
-
-// MARK: - AppliedChord
-
-struct AppliedChord: Chord {
-    let function: Function
-    let inversion: Inversion?
-
-    // MARK: Chord
-
+    let function: Function?
     let numeral: Numeral
     var notes: [Int] {
         return [1, 4, 7]

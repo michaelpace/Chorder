@@ -27,7 +27,7 @@ struct Parser {
                     return nil
                 }
 
-                return SimpleChord(mode: mode, inversion: inversion, numeral: numeral)
+                return Chord(mode: mode, inversion: inversion, function: nil, numeral: numeral)
 
             } else if case (let .number(functionString), let .additionalNumbers(inversionString), let .number(numeralString)) = threeTokens {
 
@@ -40,7 +40,7 @@ struct Parser {
                     return nil
                 }
 
-                return AppliedChord(function: function, inversion: inversion, numeral: numeral)
+                return Chord(mode: numeral.defaultMode, inversion: inversion, function: function, numeral: numeral)
 
             } else {
                 assertionFailure("Unexpected sequence of tokens: \(tokens)"); return nil
@@ -59,7 +59,7 @@ struct Parser {
                     return nil
                 }
 
-                return SimpleChord(mode: mode, inversion: nil, numeral: numeral)
+                return Chord(mode: mode, inversion: nil, function: nil, numeral: numeral)
 
             } else if case (let .number(numeralString), let .additionalNumbers(inversionString)) = twoTokens {
 
@@ -71,7 +71,7 @@ struct Parser {
                     return nil
                 }
 
-                return SimpleChord(mode: numeral.defaultMode, inversion: inversion, numeral: numeral)
+                return Chord(mode: numeral.defaultMode, inversion: inversion, function: nil, numeral: numeral)
 
             } else if case (let .number(functionString), let .number(numeralString)) = twoTokens {
 
@@ -83,13 +83,13 @@ struct Parser {
                     return nil
                 }
 
-                return AppliedChord(function: function, inversion: nil, numeral: numeral)
+                return Chord(mode: numeral.defaultMode, inversion: nil, function: function, numeral: numeral)
 
             }
 
         case 1:
             guard case let .number(numeralString) = tokens[0], let numeral = Numeral(hooktheoryString: numeralString) else { assertionFailure("Invalid tokens: \(tokens)"); return nil }
-            return SimpleChord(mode: numeral.defaultMode, inversion: nil, numeral: numeral)
+            return Chord(mode: numeral.defaultMode, inversion: nil, function: nil, numeral: numeral)
             
         default:
             assertionFailure("Invalid tokens: \(tokens)")
