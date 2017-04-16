@@ -194,21 +194,6 @@ extension Character {
  chord = simple-chord | applied-chord;
  trends-progression = chord, {".", chord};
  api-progression = chord, {",", chord};
- 
- -------------------------------------------------------------------------------------------------------
- 
- simple chord:
-     letter? that's the mode
-     number. that's the numeral
-     number(s)? that's the inversion
-        letter? -> number -> numbers?
- 
- applied chord:
-     number. that's the function
-     number(s)? that's the inversion
-     /. that's the application sign.
-     number. that's the numeral.
-         number -> numbers? -> / -> number
 
  */
 
@@ -234,89 +219,13 @@ enum Token: Equatable {
 
     static func == (lhs: Token, rhs: Token) -> Bool {
         switch (lhs, rhs) {
-        case (let .letter(value: lhsValue), let .letter(value: rhsValue)), (let .number(value: lhsValue), let .number(value: rhsValue)), (let .additionalNumbers(value: lhsValue), let .additionalNumbers(value: rhsValue)):
-            return lhsValue == rhsValue
-        case (.slash, .slash):
+        case (.letter, .letter), (.number, .number), (.additionalNumbers, .additionalNumbers), (.slash, .slash):
             return true
         default:
             return false
         }
     }
     
-}
-
-struct TokenSequence {
-    let tokens: [Token]
-
-    var hasSlash: Bool {
-        return tokens.contains(.slash)
-    }
-
-    init?(with tokens: [Token]) {
-        guard tokens.isNotEmpty else { return nil }
-
-        self.tokens = tokens
-    }
-}
-
-struct Tokenizer {
-
-    static func tokenize(string: String) -> TokenSequence? {
-        let characters = string.characters
-
-        var tokens = [Token]()
-        var index = string.characters.startIndex
-
-        while index != characters.endIndex {
-
-            let character = characters[index]
-            guard let token = Token(character: characters[index]) else { assertionFailure("Encountered unexpected character: \(character)"); break }
-            tokens.append(token)
-
-            // Only continue beyond this guard to parse additional numbers if this one was a number.
-            guard character.isNumeric else { index = characters.index(after: index); continue }
-
-            var nextIndex = characters.index(after: index)
-            var numbersSeen = String()
-
-            while nextIndex != characters.endIndex {
-                let nextCharacter = characters[nextIndex]
-                guard nextCharacter.isNumeric else { break }
-
-                numbersSeen.append(nextCharacter)
-                nextIndex = characters.index(after: nextIndex)
-            }
-
-            guard numbersSeen.characters.count > 0 else { index = characters.index(after: index); continue }
-
-            tokens.append(.additionalNumbers(value: numbersSeen))
-            index = nextIndex
-        }
-
-        return TokenSequence(with: tokens)
-    }
-
-}
-
-// Test code. TODO: Remove.
-//let strings = ["1", "m164", "b1", "b76", "7/5", "443/7"]
-//strings.forEach { string in
-//    let tokenSequence = Tokenizer.tokenize(string: string)
-//    print("TokenSequence for \(string): \(tokenSequence)")
-//}
-
-struct Parser {
-
-    func parse(tokens: TokenSequence) -> Chord {
-        if tokens.hasSlash {
-            // applied chord
-        } else {
-            // simple chord
-        }
-
-        return SimpleChord(mode: .ionian, inversion: nil, numeral: .one)
-    }
-
 }
 
 enum Numeral {
@@ -329,6 +238,29 @@ enum Numeral {
     case seven
 }
 
+extension Numeral {
+    init?(hooktheoryString: String) {
+        switch hooktheoryString {
+        case "1":
+            self = .one
+        case "2":
+            self = .two
+        case "3":
+            self = .three
+        case "4":
+            self = .four
+        case "5":
+            self = .five
+        case "6":
+            self = .six
+        case "7":
+            self = .seven
+        default:
+            return nil
+        }
+    }
+}
+
 enum Mode {
     case ionian
     case dorian
@@ -337,6 +269,27 @@ enum Mode {
     case mixolydian
     case aoelian
     case locrian
+}
+
+extension Mode {
+    init?(hooktheoryString: String) {
+        switch hooktheoryString.lowercased() {
+        case "d":
+            self = .dorian
+        case "y":
+            self = .phrygian
+        case "l":
+            self = .lydian
+        case "m":
+            self = .mixolydian
+        case "b":
+            self = .aoelian
+        case "c":
+            self = .locrian
+        default:
+            return nil
+        }
+    }
 }
 
 // TODO: Find actual names for these.
@@ -349,10 +302,46 @@ enum Inversion {
     case seven
 }
 
+extension Inversion {
+    init?(hooktheoryString: String) {
+        switch hooktheoryString {
+        case "42":
+            self = .fourTwo
+        case "43":
+            self = .fourThree
+        case "6":
+            self = .six
+        case "64":
+            self = .sixFour
+        case "65":
+            self = .sixFive
+        case "7":
+            self = .seven
+        default:
+            return nil
+        }
+    }
+}
+
 enum Function {
     case four
     case five
     case seven
+}
+
+extension Function {
+    init?(hooktheoryString: String) {
+        switch hooktheoryString {
+        case "4":
+            self = .four
+        case "5":
+            self = .five
+        case "7":
+            self = .seven
+        default:
+            return nil
+        }
+    }
 }
 
 protocol Chord {
@@ -381,6 +370,149 @@ struct AppliedChord: Chord {
     var notes: [Int] {
         return [1, 4, 7]
     }
+}
+
+struct Tokenizer {
+
+    static func tokenize(string: String) -> [Token]? {
+        let characters = string.characters
+
+        var tokens = [Token]()
+        var index = string.characters.startIndex
+
+        while index != characters.endIndex {
+
+            let character = characters[index]
+            guard let token = Token(character: characters[index]) else { assertionFailure("Encountered unexpected character: \(character)"); break }
+            if token != .slash {
+                tokens.append(token)
+            }
+
+            // Only continue beyond this guard to parse additional numbers if _this_ one was a number. Otherwise, we'll pick them up on the next loop.
+            guard character.isNumeric else { index = characters.index(after: index); continue }
+
+            var nextIndex = characters.index(after: index)
+            var numbersSeen = String()
+
+            while nextIndex != characters.endIndex {
+                let nextCharacter = characters[nextIndex]
+                guard nextCharacter.isNumeric else { break }
+
+                numbersSeen.append(nextCharacter)
+                nextIndex = characters.index(after: nextIndex)
+            }
+
+            guard numbersSeen.characters.count > 0 else { index = characters.index(after: index); continue }
+
+            tokens.append(.additionalNumbers(value: numbersSeen))
+            index = nextIndex
+        }
+
+        return tokens
+    }
+
+}
+
+struct Parser {
+
+    static func parse(tokens: [Token]) -> Chord? {
+
+        switch tokens.count {
+        case 3:
+            let threeTokens = (tokens[0], tokens[1], tokens[2])
+
+            if case (let .letter(modeString), let .number(numeralString), let .additionalNumbers(inversionString)) = threeTokens {
+
+                guard
+                    let mode = Mode(hooktheoryString: modeString),
+                    let numeral = Numeral(hooktheoryString: numeralString),
+                    let inversion = Inversion(hooktheoryString: inversionString) else
+                {
+                    assertionFailure("Invalid tokens: \(tokens)")
+                    return nil
+                }
+
+                return SimpleChord(mode: mode, inversion: inversion, numeral: numeral)
+
+            } else if case (let .number(functionString), let .additionalNumbers(inversionString), let .number(numeralString)) = threeTokens {
+
+                guard
+                    let function = Function(hooktheoryString: functionString),
+                    let inversion = Inversion(hooktheoryString: inversionString),
+                    let numeral = Numeral(hooktheoryString: numeralString) else
+                {
+                    assertionFailure("Invalid tokens: \(tokens)")
+                    return nil
+                }
+
+                return AppliedChord(function: function, inversion: inversion, numeral: numeral)
+
+            } else {
+                assertionFailure("Unexpected sequence of tokens: \(tokens)"); return nil
+            }
+
+        case 2:
+            let twoTokens = (tokens[0], tokens[1])
+
+            if case (let .letter(modeString), let .number(numeralString)) = twoTokens {
+
+                guard
+                    let mode = Mode(hooktheoryString: modeString),
+                    let numeral = Numeral(hooktheoryString: numeralString) else
+                {
+                    assertionFailure("Invalid tokens: \(tokens)")
+                    return nil
+                }
+
+                return SimpleChord(mode: mode, inversion: nil, numeral: numeral)
+
+            } else if case (let .number(numeralString), let .additionalNumbers(inversionString)) = twoTokens {
+
+                guard
+                    let numeral = Numeral(hooktheoryString: numeralString),
+                    let inversion = Inversion(hooktheoryString: inversionString) else
+                {
+                    assertionFailure("Invalid tokens: \(tokens)")
+                    return nil
+                }
+
+                return SimpleChord(mode: .ionian, inversion: inversion, numeral: numeral)
+
+            } else if case (let .number(functionString), let .number(numeralString)) = twoTokens {
+
+                guard
+                    let function = Function(hooktheoryString: functionString),
+                    let numeral = Numeral(hooktheoryString: numeralString) else
+                {
+                    assertionFailure("Invalid tokens: \(tokens)")
+                    return nil
+                }
+
+                return AppliedChord(function: function, inversion: nil, numeral: numeral)
+
+            }
+
+        case 1:
+            guard case let .number(numeralString) = tokens[0], let numeral = Numeral(hooktheoryString: numeralString) else { assertionFailure("Invalid tokens: \(tokens)"); return nil }
+            return SimpleChord(mode: .ionian, inversion: nil, numeral: numeral)
+
+        default:
+            assertionFailure("Invalid tokens: \(tokens)")
+            return nil
+
+        }
+
+        return SimpleChord(mode: .ionian, inversion: nil, numeral: .one)
+    }
+
+}
+
+// Test code. TODO: Remove.
+let strings = ["1", "m164", "b1", "b76", "7/5", "443/7"]
+strings.forEach { string in
+    guard let tokens = Tokenizer.tokenize(string: string) else { fatalError() }
+    let chord = Parser.parse(tokens: tokens)
+    print(chord)
 }
 
 final class Chorder: Process {
