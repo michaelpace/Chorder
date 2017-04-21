@@ -212,7 +212,7 @@ final class Chorder: Process {
                     let commonChords = try JSONSerialization.jsonObject(with: data, options: []) as! [[String: Any]]
 
                     guard
-                        let chordJSON = Array(commonChords.prefix(8)).randomElement else
+                        let chordJSON = Array(commonChords.prefix(20)).randomElement else
                     {
                         print("no chords returned from hooktheory")
                         self.isFinished = true
@@ -228,8 +228,8 @@ final class Chorder: Process {
                     childPath = hooktheoryChord.childPath
 
                     guard let tokens = Tokenizer.tokenize(string: hooktheoryChord.id) else { assertionFailure("Unable to tokenize chord: \(hooktheoryChord.id)"); return }
-                    let chord = Parser.parse(tokens: tokens)
-                    print("Parsed version of \(hooktheoryChord.id): \(chord)")
+                    guard let chord = Parser.parse(tokens: tokens) else { assertionFailure("Unable to parse tokens: \(tokens)"); return }
+                    print("Intervals for \(hooktheoryChord.id): \(chord.notes)")
 
                     let remainingMeasureRhythms = Array(measureRhythms.suffix(from: 1))
                     request(with: remainingMeasureRhythms)

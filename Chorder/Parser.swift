@@ -40,7 +40,7 @@ struct Parser {
                     return nil
                 }
 
-                return Chord(mode: numeral.defaultMode, inversion: inversion, function: function, numeral: numeral)
+                return Chord(mode: .ionian, inversion: inversion, function: function, numeral: numeral)
 
             } else {
                 assertionFailure("Unexpected sequence of tokens: \(tokens)"); return nil
@@ -71,7 +71,7 @@ struct Parser {
                     return nil
                 }
 
-                return Chord(mode: numeral.defaultMode, inversion: inversion, function: nil, numeral: numeral)
+                return Chord(mode: .ionian, inversion: inversion, function: nil, numeral: numeral)
 
             } else if case (let .number(functionString), let .number(numeralString)) = twoTokens {
 
@@ -83,13 +83,13 @@ struct Parser {
                     return nil
                 }
 
-                return Chord(mode: numeral.defaultMode, inversion: nil, function: function, numeral: numeral)
+                return Chord(mode: .ionian, inversion: nil, function: function, numeral: numeral)
 
             }
 
         case 1:
             guard case let .number(numeralString) = tokens[0], let numeral = Numeral(hooktheoryString: numeralString) else { assertionFailure("Invalid tokens: \(tokens)"); return nil }
-            return Chord(mode: numeral.defaultMode, inversion: nil, function: nil, numeral: numeral)
+            return Chord(mode: .ionian, inversion: nil, function: nil, numeral: numeral)
             
         default:
             assertionFailure("Invalid tokens: \(tokens)")
