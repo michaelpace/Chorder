@@ -15,6 +15,12 @@
 		640D06EE1EA32A9D00AEF48E /* Chord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06ED1EA32A9D00AEF48E /* Chord.swift */; };
 		640D06F01EA32ADA00AEF48E /* Hooktheory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06EF1EA32ADA00AEF48E /* Hooktheory.swift */; };
 		640D06F21EA32B4200AEF48E /* Character+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640D06F11EA32B4200AEF48E /* Character+Convenience.swift */; };
+		6424BA621EB97B8600764A9E /* HooktheoryAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6424BA611EB97B8600764A9E /* HooktheoryAPIClient.swift */; };
+		6424BA641EB97BB700764A9E /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6424BA631EB97BB700764A9E /* Request.swift */; };
+		6424BA661EB980AF00764A9E /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6424BA651EB980AF00764A9E /* Result.swift */; };
+		6424BA681EB980DD00764A9E /* Parseable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6424BA671EB980DD00764A9E /* Parseable.swift */; };
+		6424BA6A1EB9831A00764A9E /* AuthenticationResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6424BA691EB9831A00764A9E /* AuthenticationResult.swift */; };
+		6424BA6C1EB984D800764A9E /* JSONSerialization+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6424BA6B1EB984D800764A9E /* JSONSerialization+Convenience.swift */; };
 		64BFBFEA1E98902F005DBCF5 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BFBFE91E98902F005DBCF5 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -36,9 +42,15 @@
 		640D06E71EA2BD4E00AEF48E /* Int+Parity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Int+Parity.swift"; sourceTree = "<group>"; };
 		640D06E91EA32A4800AEF48E /* Tokenizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tokenizer.swift; sourceTree = "<group>"; };
 		640D06EB1EA32A5300AEF48E /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
-		640D06ED1EA32A9D00AEF48E /* Chord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chord.swift; sourceTree = "<group>"; };
+		640D06ED1EA32A9D00AEF48E /* Chord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Chord.swift; path = Chorder/Chord.swift; sourceTree = "<group>"; };
 		640D06EF1EA32ADA00AEF48E /* Hooktheory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hooktheory.swift; sourceTree = "<group>"; };
 		640D06F11EA32B4200AEF48E /* Character+Convenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Character+Convenience.swift"; sourceTree = "<group>"; };
+		6424BA611EB97B8600764A9E /* HooktheoryAPIClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HooktheoryAPIClient.swift; sourceTree = "<group>"; };
+		6424BA631EB97BB700764A9E /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
+		6424BA651EB980AF00764A9E /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
+		6424BA671EB980DD00764A9E /* Parseable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parseable.swift; sourceTree = "<group>"; };
+		6424BA691EB9831A00764A9E /* AuthenticationResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationResult.swift; sourceTree = "<group>"; };
+		6424BA6B1EB984D800764A9E /* JSONSerialization+Convenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "JSONSerialization+Convenience.swift"; sourceTree = "<group>"; };
 		64BFBFE61E98902F005DBCF5 /* Chorder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Chorder; sourceTree = BUILT_PRODUCTS_DIR; };
 		64BFBFE91E98902F005DBCF5 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -78,14 +90,28 @@
 		640D06F41EA32C6600AEF48E /* Chord */ = {
 			isa = PBXGroup;
 			children = (
-				640D06ED1EA32A9D00AEF48E /* Chord.swift */,
 			);
 			name = Chord;
+			sourceTree = "<group>";
+		};
+		6424BA601EB97B7900764A9E /* Hooktheory */ = {
+			isa = PBXGroup;
+			children = (
+				6424BA611EB97B8600764A9E /* HooktheoryAPIClient.swift */,
+				6424BA631EB97BB700764A9E /* Request.swift */,
+				6424BA651EB980AF00764A9E /* Result.swift */,
+				6424BA671EB980DD00764A9E /* Parseable.swift */,
+				6424BA6B1EB984D800764A9E /* JSONSerialization+Convenience.swift */,
+				6424BA691EB9831A00764A9E /* AuthenticationResult.swift */,
+				640D06ED1EA32A9D00AEF48E /* Chord.swift */,
+			);
+			name = Hooktheory;
 			sourceTree = "<group>";
 		};
 		64BFBFDD1E98902F005DBCF5 = {
 			isa = PBXGroup;
 			children = (
+				6424BA601EB97B7900764A9E /* Hooktheory */,
 				64BFBFE81E98902F005DBCF5 /* Chorder */,
 				64BFBFE71E98902F005DBCF5 /* Products */,
 			);
@@ -173,11 +199,17 @@
 				640D06F21EA32B4200AEF48E /* Character+Convenience.swift in Sources */,
 				640D06EA1EA32A4800AEF48E /* Tokenizer.swift in Sources */,
 				640D06EC1EA32A5300AEF48E /* Parser.swift in Sources */,
+				6424BA641EB97BB700764A9E /* Request.swift in Sources */,
+				6424BA681EB980DD00764A9E /* Parseable.swift in Sources */,
+				6424BA6A1EB9831A00764A9E /* AuthenticationResult.swift in Sources */,
 				64BFBFEA1E98902F005DBCF5 /* main.swift in Sources */,
+				6424BA6C1EB984D800764A9E /* JSONSerialization+Convenience.swift in Sources */,
+				6424BA661EB980AF00764A9E /* Result.swift in Sources */,
 				640D06E81EA2BD4E00AEF48E /* Int+Parity.swift in Sources */,
 				640D06E51EA2BD0C00AEF48E /* Array+Empty.swift in Sources */,
 				640D06EE1EA32A9D00AEF48E /* Chord.swift in Sources */,
 				640D06F01EA32ADA00AEF48E /* Hooktheory.swift in Sources */,
+				6424BA621EB97B8600764A9E /* HooktheoryAPIClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

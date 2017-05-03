@@ -103,7 +103,7 @@ enum Function {
 
 // MARK: - Chord
 
-struct Chord {
+struct Chord: Parseable {
     let mode: Mode
     let inversion: Inversion?
     let function: Function?
@@ -126,5 +126,10 @@ struct Chord {
         let possiblyInvertedTriad = transposedTriad.map { $0 % mode.intervals.count }
 
         return possiblyInvertedTriad.map { mode.intervals[$0] }
+    }
+
+    static func parse(from data: Data) -> Chord? {
+        // TODO: Start here.
+        return nil
     }
 }

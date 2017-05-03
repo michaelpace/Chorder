@@ -33,31 +33,39 @@ struct Argument {
     /// Encapsulates keys for command line arguments.
     enum Key: String {
 
-        /// Key for a Hooktheory API activkey.
-        case activkey = "--activkey"
+        /// Key for a Hooktheory username.
+        case username = "-u"
+
+        /// Key for a Hooktheory password.
+        case password = "-p"
 
         /// Key for the time signature to use.
-        case timeSignature = "--ts"
+        case timeSignature = "-ts"
     }
 }
 
 /// Represents a configuration passed in via the command line with which to run Chorder.
 struct Configuration {
 
-    /// The activkey with which to authenticate with Hooktheory's API.
-    let activkey: String
+    /// The username with which to authenticate with Hooktheory's API.
+    let username: String
+
+    /// The password with which to authenticate with Hooktheory's API.
+    let password: String
 
     /// The time signature with which to generate chords.
     let timeSignature: TimeSignature
 
     init?(arguments: [Argument]) {
         guard
-            let activkey = arguments.first(where: { $0.key == .activkey })?.value,
+            let username = arguments.first(where: { $0.key == .username })?.value,
+            let password = arguments.first(where: { $0.key == .password })?.value,
             let timeSignatureString = arguments.first(where: { $0.key == .timeSignature })?.value,
             let timeSignature = TimeSignature(rawValue: timeSignatureString) else
         { return nil }
 
-        self.activkey = activkey
+        self.username = username
+        self.password = password
         self.timeSignature = timeSignature
     }
 
@@ -93,14 +101,18 @@ struct MeasureRhythm {
 
 // MARK: - Networking
 
-func urlSession(with activkey: String) -> URLSession {
+func urlSession(with activkey: String? = nil) -> URLSession {
     let sessionConfiguration = URLSessionConfiguration.default
-    sessionConfiguration.httpAdditionalHeaders = ["Authorization": "Bearer \(activkey)"]
+
+    if let activkey = activkey {
+        sessionConfiguration.httpAdditionalHeaders = ["Authorization": "Bearer \(activkey)"]
+    }
+
     return URLSession(configuration: sessionConfiguration)
 }
 
 /// A protocol describing a type which is a process which can be finished.
-protocol Process {
+protocol Runnable {
 
     /// Whether this process is finished. Set to `true` to finish the process.
     var isFinished: Bool { get set }
@@ -144,9 +156,11 @@ struct HooktheoryChord {
     }
 }
 
-final class Chorder: Process {
+final class Chorder: Runnable {
 
-    // MARK: - Process
+    fileprivate let hooktheoryAPIClient = HooktheoryAPIClient()
+
+    // MARK: - Runnable
 
     var isFinished = false
 
@@ -157,10 +171,35 @@ final class Chorder: Process {
         let parsedArguments = zip(keys, values).flatMap { (key, value) in return Argument(key: key, value: value) }
         guard let configuration = Configuration(arguments: parsedArguments) else { fatalError("Invalid arguments.") }
 
-        main(configuration: configuration)
+        authenticate(with: configuration.username, and: configuration.password) { [weak self] activkey in
+            self?.run(with: activkey, and: configuration)
+        }
     }
 
-    private func main(configuration: Configuration) {
+}
+
+private extension Chorder {
+
+    func authenticate(with username: String, and password: String, completion: @escaping (String) -> Void) {
+
+        hooktheoryAPIClient.perform(.authenticate(username: username, password: password)) { (result: Result<AuthenticationResult>) in
+
+            // TODO: Call completion.
+
+            switch result {
+            case let .success(authenticationResult):
+                print("success! \(authenticationResult)")
+            case let .failure(error):
+                print("error! \(error)")
+            }
+
+        }
+
+    }
+
+    func run(with activkey: String, and configuration: Configuration) {
+
+        // TODO: Start here next time. Organize this stuff. Should only need to make cp-less /trends/nodes request once, and then can append the query parameter `cp`, like `?cp=4,1` or w/e. See https://www.hooktheory.com/api/trends/docs and http://forum.hooktheory.com/t/trends-api-chord-input/2726
 
         // TODO: Constant-ize or configure-ize [2, 4, 8]?
         guard let numberOfMeasures = [2, 4, 8].randomElement else { return assertionFailure("Failure retrieving a random element.") }
@@ -169,9 +208,7 @@ final class Chorder: Process {
             return MeasureRhythm(beatsWithChords: beatsWithChords)
         }
 
-        // TODO: Start here next time. Organize this stuff. Should only need to make cp-less /trends/nodes request once, and then can append the query parameter `cp`, like `?cp=4,1` or w/e. See https://www.hooktheory.com/api/trends/docs and http://forum.hooktheory.com/t/trends-api-chord-input/272
-
-        let session = urlSession(with: configuration.activkey)
+        let session = urlSession(with: activkey)
 
         var childPath = ""
         print("going to request \(measureRhythms.count) chords")
@@ -193,18 +230,18 @@ final class Chorder: Process {
 
             let task = session.dataTask(with: url) { (data, response, error) in
                 guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                    print("non-200")
+                    print("TODO")
                     self.isFinished = true
                     return
                 }
 
-                if let error = error {
-                    print("error: \(error)")
+                if error != nil {
+                    // TODO
                     return
                 }
 
                 guard let data = data else {
-                    print("no data")
+                    print("TODO")
                     return
                 }
 
@@ -246,9 +283,6 @@ final class Chorder: Process {
     }
 }
 
-autoreleasepool {
-    let chorder = Chorder()
-    chorder.start()
-
-    while !chorder.isFinished {}
-}
+let chorder = Chorder()
+chorder.start()
+while !chorder.isFinished {}
